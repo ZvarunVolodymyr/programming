@@ -53,21 +53,10 @@ def input_number(is_float = False):
     return num
 
 
-def main_function():
-    print('Введіть натуральне число n(в рядку має бути тільки число, без лишніх символів)')
+def main_function(n, elements_list):
+    max = min = elements_list[0]
 
-    n = int(input_number())
-    elements_list = []
-
-    print('Введіть n чисел, кожне число в новому рядку(дійсна частина вказана через . або ,)')
-
-    max = min = float(input_number(True))
-    elements_list.append(max)
-
-    for i in range(n - 1):
-        num = float(input_number(True))
-        elements_list.append(num)
-
+    for num in elements_list:
         if min > num:
             min = num
 
@@ -86,4 +75,17 @@ def main_function():
     return elements_list
 
 
-print(main_function())
+def cin():
+    print('Введіть натуральне число n(в рядку має бути тільки число, без лишніх символів)')
+
+    n = int(input_number())
+    elements_list = []
+
+    print('Введіть n чисел, кожне число в новому рядку(дійсна частина вказана через . або ,)')
+    for i in range(n):
+        elements_list.append(float(input_number(True)))
+
+    return [n, elements_list]
+
+input_value = cin()
+print(main_function(input_value[0], input_value[1]))
