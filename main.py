@@ -50,6 +50,9 @@ def input_natural_number():
             return n
         except ValueError:
             print('Ввід не правильний, спробуйте йще раз')
+        except KeyboardInterrupt:
+            print('Програма завершила свою роботу')
+            exit()
 
 
 def output(n:int, matrix):
