@@ -1,93 +1,72 @@
-def is_int_number(num: str):
-    if num == '':
-        return False
+# right->down->left->up == 0->1->2->3
+class spiral_trail:
+    i = 0
+    j = 0
+    n = 0
+    matrix = []
+    direction = 0
 
-    for i in num:
-        if not ('0' <= i <= '9'):
-            return False
+    def __init__(self, n:int):
+        self.matrix = [[0] * n for i in range(n)]
+        self.n = n
 
-    return True
-
-
-def is_float_number(num: str):
-    if num == '':
-        return False
-
-    count_of_points = 0
-    is_first_symbol = True
-    has_number = False
-
-    for i in num:
-        if i == '-' and is_first_symbol == True and len(num) != 1:
-            continue
-        is_first_symbol = False
-
-        if not (('0' <= i <= '9' or i == '.' or i == ',') and count_of_points <= 1):
-            return False
-
-        if '0' <= i <= '9':
-            has_number = True
-
-        if (i == '.' or i == ',') and has_number == True:
-            count_of_points += 1
-        elif i == '.' or i == ',':
-            return False
-
-    return True
-
-
-def input_number(is_float = False):
-    num = 0
-    flag = False
-    while not flag:
-        num = input()
-        if is_float:
-            if is_float_number(num):
-                flag = True
+    def direction_change(self):
+        i = self.i
+        j = self.j
+        if self.direction in (0, 2):
+            j += (1 if self.direction == 0 else -1)
         else:
-            if is_int_number(num):
-                flag = True
+            i += (1 if self.direction == 1 else -1)
 
-        if flag == False:
-            print('Неправильний ввід, спробуйте йще раз')
-    return num
+        if not (0 <= i < self.n and 0 <= j < self.n and self.matrix[i][j] == 0):
+            self.direction = (self.direction + 1) % 4
+
+    def next_step(self):
+        if self.direction in (0, 2):
+            self.j += (1 if self.direction == 0 else -1)
+        else:
+            self.i += (1 if self.direction == 1 else -1)
+
+    def set_value(self, val:int):
+        self.matrix[self.i][self.j] = val
+
+    def output(self):
+        for i in range(self.n):
+            print(self.matrix[i])
+        print()
+
+def main_function(n:int):
+    spiral = spiral_trail(n)
+    for i in range(1, n**2 + 1):
+        spiral.set_value(i)
+        spiral.direction_change()
+        spiral.next_step()
+
+    return spiral
 
 
-def main_function(n, elements_list):
-    max = min = elements_list[0]
-
-    for num in elements_list:
-        if min > num:
-            min = num
-
-        if max < num:
-            max = num
-
-    coefficient = 0
-    if elements_list[0] >= 0:
-        coefficient = min * min
-    else:
-        coefficient = max * max
-
-    for i in range(n):
-        elements_list[i] *= coefficient
-
-    return elements_list
+def input_natural_number():
+    while True:
+        try:
+            n = int(input())
+            if n <= 0 and n != -1:
+                int('error')
+            return n
+        except ValueError:
+            print('Ввід не правильний, спробуйте йще раз')
+        except KeyboardInterrupt:
+            print('Програма завершила свою роботу')
+            exit()
 
 
-def cin():
-    print('Введіть натуральне число n(в рядку має бути тільки число, без лишніх символів)')
-    try:
-        n = int(input_number())
-        elements_list = []
 
-        print('Введіть n чисел, кожне число в новому рядку(дійсна частина вказана через . або ,)')
-        for i in range(n):
-            elements_list.append(float(input_number(True)))
-    except KeyboardInterrupt:
-        print('Ви екстренно завершили роботу програми')
+
+print('Введіть одне натуральне число n(для виходу з програми введіть -1)')
+while True:
+    n = input_natural_number()
+    if n == -1:
+        print('Програма закінчила свою роботу')
         exit()
-    return [n, elements_list]
-
-input_value = cin()
-print(main_function(input_value[0], input_value[1]))
+    answer_matrix = main_function(n)
+    answer_matrix.output()
+    print('Для продовження роботи введіть йще одне число, або -1 для виходу з програми')
