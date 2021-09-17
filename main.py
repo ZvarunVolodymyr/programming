@@ -45,7 +45,7 @@ def input_natural_number():
     while True:
         try:
             n = int(input())
-            if n <= 0:
+            if n <= 0 and n != -1:
                 int('error')
             return n
         except ValueError:
@@ -55,7 +55,14 @@ def input_natural_number():
 def output(n:int, matrix):
     for i in range(n):
         print(matrix[i])
+    print()
 
 
-n = input_natural_number()
-output(n, main_function(n))
+print('Введіть одне натуральне число n(для виходу з програми введіть -1)')
+while True:
+    n = input_natural_number()
+    if n == -1:
+        print('Програма закінчила свою роботу')
+        exit()
+    output(n, main_function(n))
+    print('Для продовження роботи введіть йще одне число, або -1 для виходу з програми')
