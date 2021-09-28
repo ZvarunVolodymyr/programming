@@ -1,5 +1,5 @@
 import os
-
+import date_functions
 
 def is_str(value: []):
     return value[0]
@@ -61,13 +61,12 @@ def is_in_list(value:[]):
 
 
 def is_attribute(value:[]):
-    n:str = value[0]
+    n = value[0]
     att = value[1]
     try:
-        n.__getattribute__(att)
+        return n.__getattribute__(att)
     except Exception:
         raise ValueError("об'єкт не має атрибута " + str(att))
-    return n.__getattribute__(att)
 
 
 def is_valid_array(value: []):
@@ -99,22 +98,6 @@ def is_passport(value: []):
     return n
 
 
-def is_month_day(value: []):
-    day = value[0]
-    month = value[1]
-    year = value[2]
-    if day <= 0 or month <= 0 or year <= 0 or month > 12 or day > 31:
-        raise ValueError
-    if month in (4, 6, 9, 11) and day == 31:
-        raise ValueError
-    if month == 2:
-        if day == 30:
-            raise ValueError
-        if not (year % 400 == 0 or (year % 4 == 0 and year % 100 != 0)):
-            if day == 29:
-                raise ValueError
-
-
 def is_date(value: []):
     n = value[0]
     n = n.split('.')
@@ -125,7 +108,7 @@ def is_date(value: []):
         day = is_int_number([n[0]])
         month = is_int_number([n[1]])
         year = is_int_number([n[2]])
-        is_valid(is_month_day, day, month, year)
+        is_valid(date_functions.is_month_day, day, month, year)
     except ValueError:
         raise ValueError(str(value[0]) + ': некоректна дата')
     return '.'.join([str(day), str(month), str(year)])
@@ -133,12 +116,11 @@ def is_date(value: []):
 
 def is_date_after_term(value: []):
     n = value[0]
-    n = is_date(n)
-    date = list(map(int, n.split('.')))
-    start_date = list(map(int, value[0].split('.')))
-    term = list(map(int, value[0].split('.')))
-    for i in range(3):
-        start_date[i] += term[i]
+    n = is_date([n])
+    date = date_functions.date_plus_date(value[1], value[2])
+    if not date_functions.comparison(n, date) or date_functions.comparison(n, value[1]):
+        raise ValueError(n + ' виходить за межі терміну')
+    return n
 
 
 def is_vaccine(value: []):
@@ -155,6 +137,7 @@ def is_file(value: []):
     n = n.strip()
     if not os.path.isfile(n):
         raise ValueError(str(n) + ': файлу не існує, або програма його не бачить')
+    return n
 
 
 def is_valid(additional_condition=is_str, *value_for_conditional):

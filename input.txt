@@ -1,9 +1,9 @@
 ------------
-date_of_birth: 1.1.1
-end_date: 1.2.2
-id: 10
-international_passport: ab231485
-start_date: 1.1.2
-username: alpha
-vaccine: moderna
+id: 1
+username: abb
+birth_date: 1.1.5
+start_date: 1.1.20
+end_date: 2.1.20
+vaccine: pfizer
+international_passport: aa000000
 --------------

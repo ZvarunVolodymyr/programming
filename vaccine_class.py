@@ -4,43 +4,49 @@ from sort import default_comparator
 
 
 class COVID_CERTIFICATE:
-    id: int = None
-    username: str = None
-    international_passport: str = None
-    start_date: str = None
-    end_date: str = None
-    date_of_birth: str = None
-    vaccine: str = None
+    id: int = ''
+    username: str = ''
+    international_passport: str = ''
+    start_date: str = ''
+    end_date: str = ''
+    birth_date: str = ''
+    vaccine: str = ''
     __valid_check = {}
 
-    def __init__(self, id=None, username=None, passport=None, start_date=None, end_date=None, date_of_birth=None,
-                 vaccine=None):
+    def __init__(self, id='', username='', passport='', start_date='', end_date='', date_of_birth='',
+                 vaccine=''):
         self.__valid_check['id'] = validation.is_natural_number
         self.__valid_check['username'] = validation.is_username
         self.__valid_check['international_passport'] = validation.is_passport
-        self.__valid_check['start_date'] = validation.is_date
-        self.__valid_check['end_date'] = validation.is_date
-        self.__valid_check['date_of_birth'] = validation.is_date
+        self.__valid_check['start_date'] = validation.is_date_after_term
+        self.__valid_check['end_date'] = validation.is_date_after_term
+        self.__valid_check['birth_date'] = validation.is_date
         self.__valid_check['vaccine'] = validation.is_vaccine
 
-        if id is None:
+        if id == '':
             return
         self.id = self.is_valid('id', id)
         self.username = self.is_valid('username', username)
         self.international_passport = self.is_valid('international_passport', passport)
+        self.birth_date = self.is_valid('date_of_birth', date_of_birth)
         self.start_date = self.is_valid('start_date', start_date)
         self.end_date = self.is_valid('end_date', end_date)
-        self.date_of_birth = self.is_valid('date_of_birth', date_of_birth)
         self.vaccine = self.is_valid('vaccine', vaccine)
 
     def is_valid(self, name, val, log_file=''):
         try:
-            return validation.is_valid(self.__valid_check[name], str(val))
+            if name == 'start_date':
+                return validation.is_valid(self.__valid_check[name], str(val), self.birth_date, '0.0.120')
+            elif name == 'end_date':
+                return validation.is_valid(self.__valid_check[name], str(val), self.start_date, '0.0.1')
+            else:
+                return validation.is_valid(self.__valid_check[name], str(val))
         except ValueError as error:
             validation.was_error(error, log_file)
             return None
         except KeyError:
             validation.was_error('такого поля не існує', log_file)
+
 
     def has_value(self, value):
         for i in [a for a in dir(self) if not ('__' in a) and not callable(getattr(self, a))]:
@@ -58,25 +64,43 @@ class COVID_CERTIFICATE:
         return s
 
     def input(self):
-        for i in [a for a in dir(self) if not ('__' in a) and not callable(getattr(self, a))]:
-            self.__setattr__(i, validation.input_validation(f'Введіть {i}:', self.__valid_check[i]))
+        self.id = validation.input_validation('Введіть id', self.__valid_check['id'])
+        self.username = validation.input_validation('Введіть username', self.__valid_check['username'])
+        self.birth_date = validation.input_validation('Введіть birth_date', self.__valid_check['birth_date'])
+        self.start_date = validation.input_validation('Введіть start_date', self.__valid_check['start_date'],
+                                                      self.birth_date, '0.0.120')
+        self.end_date = validation.input_validation('Введіть end_date', self.__valid_check['end_date'],
+                                                    self.start_date, '0.0.1')
+        self.vaccine = validation.input_validation('Введіть vaccine', self.__valid_check['vaccine'])
+        self.international_passport = validation.input_validation('Введіть international_passport',
+                                                                  self.__valid_check['international_passport'])
 
     def __repr__(self):
         return self.__str__()
 
     def __str__(self):
         s = ''
-        for i in [a for a in dir(self) if not ('__' in a) and not callable(getattr(self, a))]:
-            s += i + ': ' + str(self.__getattribute__(i)) + '\n'
-        s = s[:-1]
+        s += 'id: ' + str(self.id) + '\n' + \
+             'username: ' + str(self.username) + '\n' + \
+             'birth_date: ' + str(self.birth_date) + '\n' + \
+             'start_date: ' + str(self.start_date) + '\n' + \
+             'end_date: ' + str(self.end_date) + '\n' + \
+             'vaccine: ' + str(self.vaccine) + '\n' + \
+             'international_passport: ' + str(self.international_passport)
         return s
 
-    def get_attr(self, name):
+    def get_attr(self, name, file=''):
         try:
             return validation.is_valid(validation.is_attribute, self, name)
         except ValueError as error:
-            validation.was_error(error)
+            validation.was_error(error, file)
             return None
+
+    def get_attr_str(self, name, file=''):
+        ans = self.get_attr(name, file)
+        if ans is not None:
+            ans = str(ans)
+        return ans
 
 class CertificateConteiner:
     list_ = []
@@ -91,18 +115,37 @@ class CertificateConteiner:
             self.input_from_file(load_from_file)
 
     def input_from_file(self, file_name=''):
-        self.update_log_file('Load info from:\n' + file_name)
+        self.update_log_file('Load info from:\n' + str(file_name))
         file = open(file_name)
         self.list_.clear()
         self.list_of_id.clear()
         certificate = COVID_CERTIFICATE()
+        flag = False
         for line in file:
             if line[0] == '-':
-                if not certificate.has_value(None):
+                if not certificate.has_value(None) and not certificate.has_value(''):
                     self.append(certificate)
                     certificate = COVID_CERTIFICATE()
+                elif flag:
+                    s = 'Неправильні данні у: '
+                    t = ''
+                    names = [a for a in dir(certificate) if not ('__' in a) and not callable(getattr(certificate, a))]
+                    for i in names:
+                        if certificate.__getattribute__(i) is None:
+                            t += i
+                            break
+                    if t == '':
+                        for i in names:
+                            if certificate.__getattribute__(i) == '':
+                                t += i
+                                break
+                    validation.was_error(s + t, self.log_file)
+                flag = True
                 continue
+
             input_ = line.split(':')
+            if certificate.has_value(None):
+                continue
             certificate.__setattr__(input_[0].strip(), certificate.is_valid(input_[0].strip(), input_[1].strip(),
                                                                             self.log_file))
             if line[0].strip() == 'id':
@@ -156,7 +199,7 @@ class CertificateConteiner:
     def find(self, value, field_name=''):
         answer = []
         for i in self.list_:
-            if field_name == '' and i.has_value(value) or field_name != '' and i.get_attr(field_name) == value:
+            if field_name == '' and i.has_value(value) or field_name != '' and i.get_attr_str(field_name) == value:
                 answer.append(i)
         return answer
 
@@ -194,7 +237,7 @@ class CertificateConteiner:
                 j = j.split('=')
                 name = j[0]
                 value = j[1]
-                old = i.get_attr(name)
+                old = i.get_attr(name, self.log_file)
                 if old is None:
                     continue
                 if i.__setattr__(name, i.is_valid(name, value)):

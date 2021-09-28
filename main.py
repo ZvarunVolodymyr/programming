@@ -41,8 +41,7 @@ def menu_change(certificate_array: vaccine_class.CertificateConteiner):
         variant = validation.input_validation('next - ввести настпну зміну\n'
                                               'stop - припинити вводити зміни')
         if variant == 'stop':
-            for i in changes:
-                certificate_array.change_by_id(id, changes)
+            certificate_array.change_by_id(id, changes)
             return 0
         name = input('Введіть назву поля, що хочете змінити\n')
         val = input('Введіть нове значення\n')
@@ -62,7 +61,7 @@ def menu_clear(certificate_array: vaccine_class.CertificateConteiner):
     certificate_array.clear()
 
 
-def menu_log_clear(certificate_array: vaccine_class.CertificateConteiner):
+def menu_clear_log(certificate_array: vaccine_class.CertificateConteiner):
     certificate_array.clear_log()
 
 
@@ -113,6 +112,9 @@ def menu():
 
         if variant == 'clear':
             menu_clear(certificate_array)
+
+        if variant == 'clear_log_file':
+            menu_clear_log(certificate_array)
 
 
 file = open('answer.txt', 'w')
