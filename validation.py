@@ -103,11 +103,13 @@ def is_date(value: []):
     n = n.split('.')
     filter(lambda x: x != '', n)
     if len(n) != 3:
-        raise ValueError(str(n) + ': некоректна дата')
+        raise ValueError(str(value[0]) + ': некоректна дата')
     try:
-        day = is_int_number([n[0]])
-        month = is_int_number([n[1]])
-        year = is_int_number([n[2]])
+        day = is_natural_number([n[0]])
+        month = is_natural_number([n[1]])
+        year = is_natural_number([n[2]])
+        if day > 31 or month > 12:
+            raise ValueError(str(value[0]) + ': некоректна дата')
         is_valid(date_functions.is_month_day, day, month, year)
     except ValueError:
         raise ValueError(str(value[0]) + ': некоректна дата')
@@ -122,6 +124,19 @@ def is_date_after_term(value: []):
         raise ValueError(n + ' виходить за межі терміну')
     return n
 
+
+def is_date_between(value: []):
+    value[0] = is_date([value[0]])
+    flag = False
+    try:
+        is_date_after_term([value[0], value[1], value[2]])
+        flag = True
+        raise ValueError(str(value[0]) + ': некоректна дата')
+    except ValueError as error:
+        if flag:
+            raise ValueError(error)
+    if is_date_after_term([value[0], value[1], value[3]]):
+        return value[0]
 
 def is_vaccine(value: []):
     n = value[0]

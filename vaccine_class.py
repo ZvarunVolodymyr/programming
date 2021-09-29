@@ -18,7 +18,7 @@ class COVID_CERTIFICATE:
         self.__valid_check['id'] = validation.is_natural_number
         self.__valid_check['username'] = validation.is_username
         self.__valid_check['international_passport'] = validation.is_passport
-        self.__valid_check['start_date'] = validation.is_date_after_term
+        self.__valid_check['start_date'] = validation.is_date_between
         self.__valid_check['end_date'] = validation.is_date_after_term
         self.__valid_check['birth_date'] = validation.is_date
         self.__valid_check['vaccine'] = validation.is_vaccine
@@ -36,7 +36,7 @@ class COVID_CERTIFICATE:
     def is_valid(self, name, val, log_file=''):
         try:
             if name == 'start_date':
-                return validation.is_valid(self.__valid_check[name], str(val), self.birth_date, '0.0.120')
+                return validation.is_valid(self.__valid_check[name], str(val), self.birth_date, '14.0.0', '0.0.120')
             elif name == 'end_date':
                 return validation.is_valid(self.__valid_check[name], str(val), self.start_date, '0.0.1')
             else:
@@ -68,7 +68,7 @@ class COVID_CERTIFICATE:
         self.username = validation.input_validation('Введіть username', self.__valid_check['username'])
         self.birth_date = validation.input_validation('Введіть birth_date', self.__valid_check['birth_date'])
         self.start_date = validation.input_validation('Введіть start_date', self.__valid_check['start_date'],
-                                                      self.birth_date, '0.0.120')
+                                                      self.birth_date, '14.0.0', '0.0.120')
         self.end_date = validation.input_validation('Введіть end_date', self.__valid_check['end_date'],
                                                     self.start_date, '0.0.1')
         self.vaccine = validation.input_validation('Введіть vaccine', self.__valid_check['vaccine'])
@@ -155,10 +155,12 @@ class CertificateConteiner:
     def update_answer_file(self):
         file = open(self.answer_file, 'w')
         file.write(self.__str__())
+        file.close()
 
     def update_log_file(self, text):
         file = open(self.log_file, 'a')
         file.write('\n' + '-' * 100 + '\n' + text)
+        file.close()
 
     def __repr__(self):
         return self.__str__()
