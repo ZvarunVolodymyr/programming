@@ -357,3 +357,21 @@ start_date: 16.1.1
 end_date: 17.1.1
 vaccine: pfizer
 international_passport: aa000000
+----------------------------------------------------------------------------------------------------
+Add:
+id: 1
+username: asd
+birth_date: 1.1.1
+start_date: 1.1.100
+end_date: 2.1.100
+vaccine: moderna
+international_passport: aa000000
+----------------------------------------------------------------------------------------------------
+Add:
+id: 1
+username: ad
+birth_date: 1.1.1
+start_date: 12.2.3
+end_date: 13.2.3
+vaccine: moderna
+international_passport: aa000000

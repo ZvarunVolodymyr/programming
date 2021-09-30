@@ -1,6 +1,7 @@
 import os
 import date_functions
 
+
 def is_str(value: []):
     return value[0]
 
@@ -37,7 +38,7 @@ def is_natural_number(value: []):
 def is_menu(value: []):
     n = value[0]
     n = n.strip()
-    if not n in value[1:]:
+    if not n in value[1]:
         raise ValueError(n + ' не є полем меню')
     return n
 
@@ -84,20 +85,6 @@ def is_valid_array(value: []):
     return s
 
 
-def is_username(value: []):
-    n = value[0]
-    if not n.isalpha():
-        raise ValueError(str(n) + ' не є username')
-    return n
-
-
-def is_passport(value: []):
-    n = value[0]
-    if not (n[:2].isalpha() and n[2:].isnumeric() and len(n) == 8):
-        raise ValueError(str(n) + 'не є міжнародним паспортом')
-    return n
-
-
 def is_date(value: []):
     n = value[0]
     n = n.split('.')
@@ -138,14 +125,6 @@ def is_date_between(value: []):
     if is_date_after_term([value[0], value[1], value[3]]):
         return value[0]
 
-def is_vaccine(value: []):
-    n = value[0]
-    n = n.strip()
-    vaccine_list = ['pfizer', 'moderna', 'AstraZeneca']
-    if not n in vaccine_list:
-        raise ValueError(n + ': не є вакциною, зазначеною в класі')
-    return n
-
 
 def is_file(value: []):
     n = value[0]
@@ -153,6 +132,10 @@ def is_file(value: []):
     if not os.path.isfile(n):
         raise ValueError(str(n) + ': файлу не існує, або програма його не бачить')
     return n
+
+
+def is_vaccine_filed(value: []):
+    return value[1](value[2], value[0], is_input=True)
 
 
 def is_valid(additional_condition=is_str, *value_for_conditional):
