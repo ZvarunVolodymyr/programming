@@ -74,20 +74,22 @@ def menu():
     menu_parameters = {'exit': menu_exit, 'load': menu_load, 'set_answer_file': menu_set_answer_file,
                        'set_log_file': menu_set_log_file, 'add': menu_add, 'remove': menu_remove, 'change': menu_change,
                        'find': menu_find, 'sort': menu_sort, 'clear': menu_clear, 'clear_log_file': menu_clear_log}
+
+    text = 'exit - вийти з програми\n' \
+           'load - зчитати масив сертефікатів з файла\n' \
+           'set_answer_file - задати файл для відображення масиву\n' \
+           'set_log_file - задати файл для історії змін\n' \
+           'add - додати сертифікат\n' \
+           'remove - видалити сертефікат з масиву за id\n' \
+           'change - змінити параметри сертефіката за його id\n' \
+           'find - знайти сертефікати масиву, в яких фігурує певний рядок\n' \
+           'sort - сортувати\n' \
+           'clear - очистити масив сертефікатів\n' \
+           'clear_log_file - очистити файл історії\n'
+
     while True:
         certificate_array = conteiner.CertificateConteiner()
-        variant = validation.input_validation('exit - вийти з програми\n'
-                                              'load - зчитати масив сертефікатів з файла\n'
-                                              'set_answer_file - задати файл для відображення масиву\n'
-                                              'set_log_file - задати файл для історії змін\n'
-                                              'add - додати сертифікат\n'
-                                              'remove - видалити сертефікат з масиву за id\n'
-                                              'change - змінити параметри сертефіката за його id\n'
-                                              'find - знайти сертефікати масиву, в яких фігурує певний рядок\n'
-                                              'sort - сортувати\n'
-                                              'clear - очистити масив сертефікатів\n'
-                                              'clear_log_file - очистити файл історії\n',
-                                              validation.is_menu, list(menu_parameters.keys()))
+        variant = validation.input_validation(text, validation.is_menu, list(menu_parameters.keys()))
         menu_parameters[variant](certificate_array)
 
 
