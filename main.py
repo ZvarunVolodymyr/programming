@@ -10,7 +10,7 @@ def menu_exit(value):
 def menu_load(certificate_array : conteiner.CertificateConteiner):
     variant = validation.input_validation('choose - для вибору файлу\n'
                                           'default - стандартний файл(input.txt)', validation.is_menu,
-                                          'choose', 'default')
+                                          ['choose', 'default'])
     file = 'input.txt'
     if variant == 'choose':
         file = validation.input_validation('Введіть назву файла', validation.is_file)
@@ -44,7 +44,7 @@ def menu_change(certificate_array: conteiner.CertificateConteiner):
     changes = []
     while True:
         variant = validation.input_validation('next - ввести настпну зміну\n'
-                                              'stop - припинити вводити зміни')
+                                              'stop - припинити вводити зміни', validation.is_menu, ['next', 'stop'])
         if variant == 'stop':
             certificate_array.change_by_id(id, changes)
             return 0
