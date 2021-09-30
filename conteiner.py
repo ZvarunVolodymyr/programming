@@ -30,7 +30,7 @@ class CertificateConteiner:
                 elif flag:
                     s = 'Неправильні данні у: '
                     t = ''
-                    names = [a for a in dir(certificate) if not ('__' in a) and not callable(getattr(certificate, a))]
+                    names = certificate.get_attr_names()
                     for i in names:
                         if certificate.__getattribute__(i) is None:
                             t += i

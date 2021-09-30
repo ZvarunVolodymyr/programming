@@ -37,7 +37,7 @@ class COVID_CERTIFICATE:
 
     def part_str(self):
         s = '['
-        for i in [a for a in dir(self) if not ('__' in a) and not callable(getattr(self, a))]:
+        for i in self.__attributes:
             s += str(self.__getattribute__(i)) + ', '
         if len(s) != 1:
             s = s[:-2]
@@ -71,3 +71,6 @@ class COVID_CERTIFICATE:
         if ans is not None:
             ans = str(ans)
         return ans
+
+    def get_attr_names(self):
+        return self.__attributes
