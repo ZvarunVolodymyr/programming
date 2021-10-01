@@ -70,6 +70,14 @@ def is_attribute(value:[]):
         raise ValueError("об'єкт не має атрибута " + str(att))
 
 
+def has_attribute(value:[]):
+    try:
+        is_attribute([value[1], value[0]])
+        return value[0]
+    except Exception as error:
+        raise ValueError(error)
+
+
 def is_valid_array(value: []):
     n = value[0]
     s = []
@@ -124,6 +132,12 @@ def is_date_between(value: []):
             raise ValueError(error)
     if is_date_after_term([value[0], value[1], value[3]]):
         return value[0]
+
+
+def is_date_in_range(value:[]):
+    if not date_functions.comparison(value[1], value[0]) or not date_functions.comparison(value[0], value[2]):
+        raise ValueError(str(value[0]) + ' : некоректна дата')
+    return value[0]
 
 
 def is_file(value: []):

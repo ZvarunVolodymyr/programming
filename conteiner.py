@@ -29,24 +29,17 @@ class CertificateConteiner:
                     certificate = COVID_CERTIFICATE()
                 elif flag:
                     s = 'Неправильні данні у: '
-                    t = ''
+                    t = '\n'
                     names = certificate.get_attr_names()
                     for i in names:
-                        if certificate.__getattribute__(i) is None:
-                            t += i
-                            break
-                    if t == '':
-                        for i in names:
-                            if certificate.__getattribute__(i) == '':
-                                t += i
-                                break
+                        if certificate.__getattribute__(i) is None or certificate.__getattribute__(i) == '':
+                            t += i + '\n'
                     validation.was_error(s + t, self.log_file)
+                self.update_log_file('')
                 flag = True
                 continue
 
             input_ = line.split(':')
-            if certificate.has_value(None):
-                continue
             certificate.__setattr__(input_[0].strip(), certificate.is_valid(input_[0].strip(), input_[1].strip(),
                                                                             self.log_file))
             if line[0].strip() == 'id':
@@ -109,12 +102,11 @@ class CertificateConteiner:
     def __getitem__(self, item):
         return self.list_[item]
 
-    def sort(self, comparator=default_comparator):
-        self.update_log_file('sort with: ' + str(comparator.__name__))
-        if type(comparator) != type(lambda a: a == a):
-            validation.was_error('компаратор не функція', self.log_file)
-            return
-        self.list_ = merge_sort(self.list_, comparator)
+    def sort(self, name=''):
+        self.update_log_file('sort with')
+        def comp(a, b, name):
+            return a.get_attr(name).lower() < b.get_attr(name).lower()
+        self.list_ = merge_sort(self.list_, comp, name)
         self.update_answer_file()
 
     def remove(self, value_to_remove, field_name='id'):

@@ -59,7 +59,9 @@ def menu_find(certificate_array: conteiner.CertificateConteiner):
 
 
 def menu_sort(certificate_array: conteiner.CertificateConteiner):
-    certificate_array.sort()
+    name = validation.input_validation('Введіть поле по якому сортувати\n', validation.has_attribute,
+                                       vaccine_class.COVID_CERTIFICATE())
+    certificate_array.sort(name)
 
 
 def menu_clear(certificate_array: conteiner.CertificateConteiner):
