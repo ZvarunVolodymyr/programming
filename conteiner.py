@@ -104,8 +104,8 @@ class CertificateConteiner:
 
     def sort(self, name=''):
         self.update_log_file('sort with')
-        def comp(a, b, name):
-            return a.get_attr(name).lower() < b.get_attr(name).lower()
+        def comp(a, b):
+            return a.get_attr(name) > b.get_attr(name)
         self.list_ = merge_sort(self.list_, comp, name)
         self.update_answer_file()
 
