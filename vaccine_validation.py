@@ -40,8 +40,9 @@ def attributes(func):
 
 
 @attributes
-def is_id(*value):
-    return validation.is_natural_number(*value)
+@validation.is_natural_number
+def is_id(value):
+    return value
 
 
 @attributes
@@ -52,8 +53,9 @@ def is_username(n):
 
 
 @attributes
-def is_birth_date(*value):
-    return validation.is_date_in_range(*value)
+@validation.is_date_in_range
+def is_birth_date(value):
+    return value
 
 
 @attributes

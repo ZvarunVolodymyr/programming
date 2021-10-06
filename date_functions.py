@@ -1,6 +1,7 @@
 import validation
 
 
+@validation.many_decorator(validation.is_natural_number, validation.is_natural_number)
 def get_max_day_in_month(month:int, year:int):
     if month in (4, 6, 9, 11):
         return 30
@@ -11,7 +12,7 @@ def get_max_day_in_month(month:int, year:int):
     return 31
 
 
-@validation.is_valid
+@validation.function_decorate
 def is_month_day(*value):
     day = value[0]
     month = value[1]
@@ -26,6 +27,7 @@ def is_month_day(*value):
                 raise ValueError
 
 
+@validation.many_decorator(validation.is_date_term, validation.is_date_term)
 def date_plus_date(date_1: str, date_2: str):
     date_1 = list(map(int, date_1.split('.')))
     date_2 = list(map(int, date_2.split('.')))
@@ -44,6 +46,7 @@ def date_plus_date(date_1: str, date_2: str):
     return '.'.join(map(str, date_2))
 
 
+@validation.many_decorator(validation.is_date_term, validation.is_date_term)
 def comparison(date_1: str, date_2 : str):
     date_1 = list(map(int, date_1.split('.')))
     date_2 = list(map(int, date_2.split('.')))
