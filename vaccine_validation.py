@@ -2,10 +2,15 @@ import validation
 from functools import partial
 
 
+def get_vaccine_validation_functions(name):
+    a = {'id': is_id, 'username': is_username, 'birth_date': is_birth_date, 'start_date': is_start_date,
+            'end_date': is_end_date, 'international_passport': is_international_passport, 'vaccine': is_vaccine}
+    return a[name]
+
+
 def get_vaccine_validation(func):
     def decorator(obj, name, val, log_file='', is_input=False):
-        name = 'is_' + name
-        func_ = partial(eval(name), val, obj)
+        func_ = partial(get_vaccine_validation_functions(name), val, obj)
         return func(func_, log_file, is_input)
     return decorator
 
@@ -21,7 +26,6 @@ def attributes(func):
                 attributes += [vaccine_object.birth_date, '14.0.0', '0.0.120']
             if name == 'is_end_date':
                 attributes += [vaccine_object.start_date, '0.0.1']
-            name = 'is_' + name
             return func(*attributes)
         except ValueError as error:
             raise error

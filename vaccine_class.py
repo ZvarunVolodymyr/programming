@@ -48,7 +48,7 @@ class COVID_CERTIFICATE:
     def input(self):
         for i in self.__attributes:
             text = 'Введіть ' + i
-            self.__setattr__(i, validation.input_validation(validation.is_vaccine_filed, self.is_valid, i, text=text))
+            self.__setattr__(i, validation.is_vaccine_filed(self.is_valid, i, text=text, function='input'))
 
     def __repr__(self):
         return self.__str__()
@@ -62,7 +62,7 @@ class COVID_CERTIFICATE:
 
     def get_attr(self, name, file=''):
         try:
-            return validation.is_valid(validation.is_attribute, self, name)
+            return validation.is_attribute(self, name)
         except ValueError as error:
             validation.was_error(error, file)
             return None

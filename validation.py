@@ -1,11 +1,21 @@
 import os
+import validation_functions
+
+
+def is_valid(func):
+    @validation_functions.get_functions
+    def decorator(funcc):
+        return funcc(function=func)
+    return decorator
+
 import date_functions
 
-
+@is_valid
 def is_str(n):
     return n
 
 
+@is_valid
 def is_float_number(n):
     n = n.strip()
     try:
@@ -14,6 +24,7 @@ def is_float_number(n):
         raise ValueError(n + ' не є дійсним числом')
 
 
+@is_valid
 def is_int_number(n):
     if type(n) == str:
         n = n.strip()
@@ -23,6 +34,7 @@ def is_int_number(n):
         raise ValueError(n + ' не є цілим числом')
 
 
+@is_valid
 def is_natural_number(n):
     n = n.strip()
     if not (is_int_number(n) and int(n) > 0):
@@ -30,6 +42,7 @@ def is_natural_number(n):
     return int(n)
 
 
+@is_valid
 def is_menu(n, list_):
     n = n.strip()
     if not n in list_:
@@ -37,6 +50,7 @@ def is_menu(n, list_):
     return n
 
 
+@is_valid
 def is_greater_then(n, list_):
     k = is_int_number(n)
     for i in list_:
@@ -45,6 +59,7 @@ def is_greater_then(n, list_):
     return k
 
 
+@is_valid
 def is_in_list(n, list_):
     n = is_natural_number(n)
     if not n in list_:
@@ -52,6 +67,7 @@ def is_in_list(n, list_):
     return n
 
 
+@is_valid
 def is_attribute(obj, att):
     try:
         return obj.__getattribute__(att)
@@ -59,6 +75,7 @@ def is_attribute(obj, att):
         raise ValueError("об'єкт не має атрибута " + str(att))
 
 
+@is_valid
 def has_attribute(att, obj):
     try:
         is_attribute(obj, att)
@@ -67,6 +84,7 @@ def has_attribute(att, obj):
         raise ValueError(error)
 
 
+@is_valid
 def is_valid_array(list_, func, size, split_):
     s = []
     if size == -1:
@@ -81,6 +99,7 @@ def is_valid_array(list_, func, size, split_):
     return s
 
 
+@is_valid
 def is_date(date):
 
     n = date.split('.')
@@ -93,12 +112,13 @@ def is_date(date):
         year = is_natural_number(n[2])
         if day > 31 or month > 12:
             raise ValueError(str(date) + ': некоректна дата')
-        is_valid(date_functions.is_month_day, day, month, year)
+        date_functions.is_month_day(day, month, year)
     except ValueError:
         raise ValueError(str(date) + ': некоректна дата')
     return '.'.join([str(day), str(month), str(year)])
 
 
+@is_valid
 def is_date_after_term(this_date, start, term):
     n = this_date
     n = is_date(n)
@@ -108,6 +128,7 @@ def is_date_after_term(this_date, start, term):
     return n
 
 
+@is_valid
 def is_date_between(date, start, term_1, term_2):
     date = is_date(date)
     flag = False
@@ -122,12 +143,14 @@ def is_date_between(date, start, term_1, term_2):
         return date
 
 
+@is_valid
 def is_date_in_range(date, start, end):
     if not date_functions.comparison(start, date) or not date_functions.comparison(start, end):
         raise ValueError(str(date) + ' : некоректна дата')
     return date
 
 
+@is_valid
 def is_file(n):
     n = n.strip()
     if not os.path.isfile(n):
@@ -135,31 +158,12 @@ def is_file(n):
     return n
 
 
+@is_valid
 def is_vaccine_filed(val, func, name):
     return func(name, val, is_input=True)
 
 
-def is_valid(additional_condition=is_str, *value_for_conditional):
-    try:
-        return additional_condition(*value_for_conditional)
-    except ValueError as error:
-        raise ValueError(error)
 
-
-def input_validation(additional_condition=is_str, *value_for_conditional, text=""):
-    slesh_n = '\n'
-    print(text, end=f'{slesh_n if text != "" else ""}')
-    while True:
-        try:
-            a = [input()]
-            a += value_for_conditional
-            return additional_condition(*a)
-        except ValueError as error:
-            print(error)
-            print('спробуйте йще раз')
-        except KeyboardInterrupt:
-            print('Програма завершила свою роботу')
-            exit()
 
 
 def was_error(message='ПОМИЛКА', file=''):

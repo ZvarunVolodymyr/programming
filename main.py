@@ -7,23 +7,22 @@ def menu_exit(value):
     exit(0)
 
 
-def menu_load(certificate_array : conteiner.CertificateConteiner):
-    variant = validation.input_validation(validation.is_menu, ['choose', 'default'],
-                                          text='choose - для вибору файлу\n'
-                                               'default - стандартний файл(input.txt)')
+def menu_load(certificate_array: conteiner.CertificateConteiner):
+    variant = validation.is_menu(['choose', 'default'], text='choose - для вибору файлу\n'
+                                                             'default - стандартний файл(input.txt)', function='input')
     file = 'input.txt'
     if variant == 'choose':
-        file = validation.input_validation(validation.is_file, text='Введіть назву файла')
+        file = validation.is_file(text='Введіть назву файла', function='input')
     certificate_array.input_from_file(file)
 
 
-def menu_set_answer_file(certificate_array : conteiner.CertificateConteiner):
-    file = validation.input_validation(validation.is_file, text='Введіть назву файла')
+def menu_set_answer_file(certificate_array: conteiner.CertificateConteiner):
+    file = validation.is_file(text='Введіть назву файла', function='input')
     certificate_array.answer_file = file
 
 
 def menu_set_log_file(certificate_array: conteiner.CertificateConteiner):
-    file = validation.input_validation(validation.is_file, text='Введіть назву файла')
+    file = validation.is_file(text='Введіть назву файла', function='input')
     certificate_array.log_file = file
 
 
@@ -34,17 +33,16 @@ def menu_add(certificate_array: conteiner.CertificateConteiner):
 
 
 def menu_remove(certificate_array: conteiner.CertificateConteiner):
-    id = validation.input_validation(text='Введіть іd сертефікату для видалення')
+    id = validation.is_str(text='Введіть іd сертефікату для видалення', function='input')
     certificate_array.remove(id)
 
 
 def menu_change(certificate_array: conteiner.CertificateConteiner):
-    id = validation.input_validation(validation.is_in_list, certificate_array.list_of_id,
-                                     text='Введіть id сертифікату до зміни')
+    id = validation.is_in_list(certificate_array.list_of_id, text='Введіть id сертифікату до зміни', function='input')
     changes = []
     while True:
-        variant = validation.input_validation(validation.is_menu, ['next', 'stop'], text='next - ввести настпну зміну\n'
-                                              'stop - припинити вводити зміни')
+        variant = validation.is_menu(['next', 'stop'], text='next - ввести настпну зміну\n'
+                                                            'stop - припинити вводити зміни', function='input')
         if variant == 'stop':
             certificate_array.change_by_id(id, changes)
             return 0
@@ -59,8 +57,8 @@ def menu_find(certificate_array: conteiner.CertificateConteiner):
 
 
 def menu_sort(certificate_array: conteiner.CertificateConteiner):
-    name = validation.input_validation(validation.has_attribute, vaccine_class.COVID_CERTIFICATE(),
-                                       text='Введіть поле по якому сортувати\n')
+    name = validation.has_attribute(vaccine_class.COVID_CERTIFICATE(), text='Введіть поле по якому сортувати\n',
+                                    function='input')
     certificate_array.sort(name)
 
 
@@ -91,7 +89,7 @@ def menu():
 
     while True:
         certificate_array = conteiner.CertificateConteiner()
-        variant = validation.input_validation(validation.is_menu, list(menu_parameters.keys()), text=text)
+        variant = validation.is_menu(list(menu_parameters.keys()), text=text, function='input')
         menu_parameters[variant](certificate_array)
 
 

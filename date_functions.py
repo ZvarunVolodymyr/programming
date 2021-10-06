@@ -1,3 +1,6 @@
+import validation
+
+
 def get_max_day_in_month(month:int, year:int):
     if month in (4, 6, 9, 11):
         return 30
@@ -8,6 +11,7 @@ def get_max_day_in_month(month:int, year:int):
     return 31
 
 
+@validation.is_valid
 def is_month_day(*value):
     day = value[0]
     month = value[1]
