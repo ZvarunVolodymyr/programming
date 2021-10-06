@@ -26,9 +26,10 @@ class COVID_CERTIFICATE:
                 return True
         return False
 
-    def is_valid(self, name, val, log_file='', is_input=False):
+    @vaccine_validation.get_vaccine_validation
+    def is_valid(func, log_file='', is_input=False):
         try:
-            return vaccine_validation.is_valid(name, val, self, log_file)
+            return func()
         except ValueError as error:
             if is_input:
                 raise ValueError(error)
@@ -47,7 +48,7 @@ class COVID_CERTIFICATE:
     def input(self):
         for i in self.__attributes:
             text = 'Введіть ' + i
-            self.__setattr__(i, validation.input_validation(text, validation.is_vaccine_filed, self.is_valid, i))
+            self.__setattr__(i, validation.input_validation(validation.is_vaccine_filed, self.is_valid, i, text=text))
 
     def __repr__(self):
         return self.__str__()

@@ -8,7 +8,7 @@ def get_max_day_in_month(month:int, year:int):
     return 31
 
 
-def is_month_day(value: []):
+def is_month_day(*value):
     day = value[0]
     month = value[1]
     year = value[2]
