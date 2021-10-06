@@ -8,10 +8,15 @@ def get_vaccine_validation_functions(name):
     return a[name]
 
 
-def get_vaccine_validation(func):
+def vaccine_decorator(func):
     def decorator(obj, name, val, log_file='', is_input=False):
-        func_ = partial(get_vaccine_validation_functions(name), val, obj)
-        return func(func_, log_file, is_input)
+        try:
+            return func(obj, name, get_vaccine_validation_functions(name)(val, obj))
+        except Exception as error:
+            if is_input:
+                raise ValueError(error)
+            validation.was_error(error, log_file)
+            return None
     return decorator
 
 

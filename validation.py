@@ -36,7 +36,7 @@ def is_int_number(n):
 
 @is_valid
 def is_natural_number(n):
-    n = n.strip()
+    n = str(n).strip()
     if not (is_int_number(n) and int(n) > 0):
         raise ValueError(n + ' не є натуральним цілим числом')
     return int(n)
@@ -163,9 +163,6 @@ def is_vaccine_filed(val, func, name):
     return func(name, val, is_input=True)
 
 
-
-
-
 def was_error(message='ПОМИЛКА', file=''):
     message = str(message)
     message = '\n' + '*' * len(message) + '\n' + message + '\n' + '*' * len(message)
@@ -176,6 +173,6 @@ def was_error(message='ПОМИЛКА', file=''):
         file.close()
 
 
-def array_input(text="", size=-1, additional_condition=is_str, split_symbol=' '):
-    list_ = input_validation(text, is_valid_array, additional_condition, size, split_symbol)
-    return list_
+# def array_input(text="", size=-1, additional_condition=is_str, split_symbol=' '):
+#     list_ = input_validation(text, is_valid_array, additional_condition, size, split_symbol)
+#     return list_

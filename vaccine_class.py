@@ -26,15 +26,9 @@ class COVID_CERTIFICATE:
                 return True
         return False
 
-    @vaccine_validation.get_vaccine_validation
-    def is_valid(func, log_file='', is_input=False):
-        try:
-            return func()
-        except ValueError as error:
-            if is_input:
-                raise ValueError(error)
-            validation.was_error(error, log_file)
-            return None
+    @vaccine_validation.vaccine_decorator
+    def is_valid(self, name, val):
+        return val
 
     def part_str(self):
         s = '['
@@ -59,6 +53,10 @@ class COVID_CERTIFICATE:
             s += i + ': ' + self.get_attr_str(i) + '\n'
         s = s[:-1]
         return s
+
+    @vaccine_validation.vaccine_decorator
+    def setattr(self, name, val):
+        self.__setattr__(name, val)
 
     def get_attr(self, name, file=''):
         try:

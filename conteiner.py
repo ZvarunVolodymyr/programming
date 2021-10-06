@@ -40,8 +40,7 @@ class CertificateConteiner:
                 continue
 
             input_ = line.split(':')
-            certificate.__setattr__(input_[0].strip(), certificate.is_valid(input_[0].strip(), input_[1].strip(),
-                                                                            self.log_file))
+            certificate.setattr(input_[0].strip(), input_[1].strip(), self.log_file)
             if line[0].strip() == 'id':
                 self.add_id(certificate.is_valid(input_[0].strip(), input_[1].strip()))
         file.close()
@@ -104,8 +103,10 @@ class CertificateConteiner:
 
     def sort(self, name=''):
         self.update_log_file('sort with')
+
         def comp(a, b):
             return a.get_attr(name) > b.get_attr(name)
+
         self.list_ = merge_sort(self.list_, comp, name)
         self.update_answer_file()
 
@@ -117,7 +118,7 @@ class CertificateConteiner:
         self.update_answer_file()
 
     def add_id(self, id):
-        id = int(id)
+        id = validation.is_natural_number(id)
         if id in self.list_of_id:
             validation.was_error('такий id уже існує', self.log_file)
             return
