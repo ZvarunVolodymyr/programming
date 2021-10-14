@@ -1,3 +1,4 @@
+import memento
 import validation
 from sort import merge_sort
 from vaccine_class import COVID_CERTIFICATE
@@ -8,12 +9,19 @@ class CertificateConteiner:
     list_of_id = []
     answer_file = ''
     log_file = ''
+    history = None
 
     def __init__(self, load_from_file='', answer_file='answer.txt', log_file='log.txt'):
+        self.list_ = []
+        self.list_of_id = []
+        self.clear_history()
         self.answer_file = answer_file
         self.log_file = log_file
         if load_from_file != '':
             self.input_from_file(load_from_file)
+
+    def clear_history(self):
+        self.history = memento.history(self)
 
     def get_new_id(self):
         new_id = 1
@@ -29,6 +37,7 @@ class CertificateConteiner:
                 validation.was_error(f'id {self.list_of_id[i]} вже зайняте, воно змінене на {new_id}',
                                      file=self.log_file)
                 self.change_by_id(self.list_of_id[i], [f'id={new_id}'])
+                self.history.pop_snap()
 
     def swap_id(self, old, new):
         for i, val in enumerate(self.list_of_id):
@@ -42,10 +51,13 @@ class CertificateConteiner:
         self.update_log_file('Load info from:\n' + str(file_name))
         file = open(file_name)
         certificate = COVID_CERTIFICATE()
+        flag = False
         for line in file.readlines()[1:]:
             if line[0] == '-':
                 if not certificate.has_value(None) and not certificate.has_value(''):
                     self.append(certificate)
+                    self.history.pop_snap()
+                    flag = True
                     certificate = COVID_CERTIFICATE()
                 else:
                     s = 'Неправильні данні у: \n'
@@ -59,6 +71,8 @@ class CertificateConteiner:
 
             input_ = list(map(lambda x: x.strip(), line.split(':')))
             certificate.setattr(input_[0], input_[1], self.log_file)
+        if flag:
+            self.was_changed()
         file.close()
 
     def update_answer_file(self):
@@ -82,7 +96,7 @@ class CertificateConteiner:
         self.add_id(value.id)
         self.list_.append(value)
         self.unique_id()
-        self.update_answer_file()
+        self.was_changed()
 
     def part_str(self):
         s = ''
@@ -125,14 +139,14 @@ class CertificateConteiner:
             return a.getattr(name) > b.getattr(name)
 
         self.list_ = merge_sort(self.list_, comp)
-        self.update_answer_file()
+        self.was_changed()
 
     def remove(self, value_to_remove, field_name='id'):
         to_remove = self.find(value_to_remove, field_name)
         for i in to_remove:
             self.update_log_file('remove:\n' + str(i))
             self.list_.remove(i)
-        self.update_answer_file()
+            self.was_changed()
 
     @validation.many_decorator(validation.is_empty, validation.is_natural_number)
     def add_id(self, id):
@@ -163,8 +177,8 @@ class CertificateConteiner:
                 self.unique_id()
 
             self.update_log_file(
-                'value in field = "' + name + '" was changed:\n' + str(old) + ' -> ' + str(current))
-            self.update_answer_file()
+                'значення в полі = "' + name + '" змінено:\n' + str(old) + ' -> ' + str(current))
+            self.was_changed()
 
     @validation.many_decorator(validation.is_empty, validation.is_natural_number)
     def has_id(self, id):
@@ -178,3 +192,18 @@ class CertificateConteiner:
     def clear(self):
         self.list_.clear()
         self.list_of_id.clear()
+        self.was_changed()
+
+    def was_changed(self):
+        self.history.new_snap()
+        self.update_answer_file()
+
+    def undo(self):
+        if self.history.undo():
+            self.update_log_file('UNDO')
+            self.update_answer_file()
+
+    def redo(self):
+        if self.history.redo():
+            self.update_log_file('REDO')
+            self.update_answer_file()

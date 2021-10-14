@@ -33,7 +33,7 @@ def menu_add(certificate_array: conteiner.CertificateConteiner):
 
 
 def menu_remove(certificate_array: conteiner.CertificateConteiner):
-    id = validation.is_str(text='Введіть іd сертефікату для видалення', function='input')
+    id = validation.is_empty(text='Введіть іd сертефікату для видалення', function='input')
     certificate_array.remove(id)
 
 
@@ -70,10 +70,19 @@ def menu_clear_log(certificate_array: conteiner.CertificateConteiner):
     certificate_array.clear_log()
 
 
+def menu_undo(certificate_array: conteiner.CertificateConteiner):
+    certificate_array.undo()
+
+
+def menu_redo(certificate_array: conteiner.CertificateConteiner):
+    certificate_array.redo()
+
+
 def menu():
     menu_parameters = {'exit': menu_exit, 'load': menu_load, 'set_answer_file': menu_set_answer_file,
                        'set_log_file': menu_set_log_file, 'add': menu_add, 'remove': menu_remove, 'change': menu_change,
-                       'find': menu_find, 'sort': menu_sort, 'clear': menu_clear, 'clear_log_file': menu_clear_log}
+                       'find': menu_find, 'sort': menu_sort, 'clear': menu_clear, 'clear_log_file': menu_clear_log,
+                       'undo': menu_undo, 'redo': menu_redo}
 
     text = 'exit - вийти з програми\n' \
            'load - зчитати масив сертефікатів з файла\n' \
@@ -85,10 +94,11 @@ def menu():
            'find - знайти сертефікати масиву, в яких фігурує певний рядок\n' \
            'sort - сортувати\n' \
            'clear - очистити масив сертефікатів\n' \
-           'clear_log_file - очистити файл історії\n'
-
+           'clear_log_file - очистити файл історії\n' \
+           'undo - назад\n' \
+           'redo - вперед\n'
+    certificate_array = conteiner.CertificateConteiner()
     while True:
-        certificate_array = conteiner.CertificateConteiner()
         variant = validation.is_menu(list(menu_parameters.keys()), text=text, function='input')
         menu_parameters[variant](certificate_array)
 
