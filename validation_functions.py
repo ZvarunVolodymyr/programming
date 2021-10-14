@@ -1,8 +1,10 @@
 from functools import partial
 
+import validation
+
 
 def get_functions_list(name):
-    return {'valid': is_valid, 'input': is_input}.get(name, is_valid)
+    return {'valid': is_valid, 'input': is_input, 'print': print_error}.get(name, is_valid)
 
 
 def get_functions(func):
@@ -35,3 +37,11 @@ def is_valid(*value_for_conditional, function=None):
         return function(*value_for_conditional)
     except ValueError as error:
         raise ValueError(error)
+
+
+def print_error(*value_for_conditional, function=None, file=''):
+    try:
+        return function(*value_for_conditional)
+    except Exception as error:
+        validation.was_error(error, file)
+        return None

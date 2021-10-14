@@ -18,10 +18,10 @@ class COVID_CERTIFICATE:
         if id == '':
             return
         for i in vars().items():
-            self.__setattr__(i[0], self.is_valid(i[0], i[1]))
+            self.setattr(i[0], i[1])
 
     def has_value(self, value):
-        for i in [a for a in dir(self) if not ('__' in a) and not callable(getattr(self, a))]:
+        for i in self.__attributes:
             if self.__getattribute__(i) == value:
                 return True
         return False
@@ -31,13 +31,7 @@ class COVID_CERTIFICATE:
         return val
 
     def part_str(self):
-        s = '['
-        for i in self.__attributes:
-            s += str(self.__getattribute__(i)) + ', '
-        if len(s) != 1:
-            s = s[:-2]
-        s += ']'
-        return s
+        return ', '.join([str(self.__getattribute__(i)) for i in self.__attributes])
 
     def input(self):
         for i in self.__attributes:
@@ -48,25 +42,18 @@ class COVID_CERTIFICATE:
         return self.__str__()
 
     def __str__(self):
-        s = ''
-        for i in self.__attributes:
-            s += i + ': ' + self.get_attr_str(i) + '\n'
-        s = s[:-1]
-        return s
+        return '\n'.join(i + ': ' + str(validation.is_attribute(self, i, function='print')) for i in self.__attributes)
 
     @vaccine_validation.vaccine_decorator
     def setattr(self, name, val):
         self.__setattr__(name, val)
 
-    def get_attr(self, name, file=''):
-        try:
-            return validation.is_attribute(self, name)
-        except ValueError as error:
-            validation.was_error(error, file)
-            return None
+    @validation.is_attribute
+    def getattr(val):
+        return val
 
     def get_attr_str(self, name, file=''):
-        ans = self.get_attr(name, file)
+        ans = self.getattr(name, function='print', file=file)
         if ans is not None:
             ans = str(ans)
         return ans
