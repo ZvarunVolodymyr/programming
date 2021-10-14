@@ -1,0 +1,25 @@
+------------
+id: 1
+username: abb1
+birth_date: 1.1.2
+start_date: 1.1.2001
+end_date: 5.1.2001
+vaccine: pfize
+international_passport: aa000000
+--------------
+id: 5
+username: Ab
+birth_date: 1.1.2000
+start_date: 1.1.2001
+end_date: 5.1.2001
+vaccine: moderna
+international_passport: aa000000
+--------------
+id: 7
+username: Cab
+birth_date: 1.1.2000
+start_date: 1.1.2001
+end_date: 5.1.2001
+vaccine: pfizer
+international_passport: aa000000
+--------------

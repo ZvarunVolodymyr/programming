@@ -1,72 +1,101 @@
-# right->down->left->up == 0->1->2->3
-class spiral_trail:
-    i = 0
-    j = 0
-    n = 0
-    matrix = []
-    direction = 0
-
-    def __init__(self, n:int):
-        self.matrix = [[0] * n for i in range(n)]
-        self.n = n
-
-    def direction_change(self):
-        i = self.i
-        j = self.j
-        if self.direction in (0, 2):
-            j += (1 if self.direction == 0 else -1)
-        else:
-            i += (1 if self.direction == 1 else -1)
-
-        if not (0 <= i < self.n and 0 <= j < self.n and self.matrix[i][j] == 0):
-            self.direction = (self.direction + 1) % 4
-
-    def next_step(self):
-        if self.direction in (0, 2):
-            self.j += (1 if self.direction == 0 else -1)
-        else:
-            self.i += (1 if self.direction == 1 else -1)
-
-    def set_value(self, val:int):
-        self.matrix[self.i][self.j] = val
-
-    def output(self):
-        for i in range(self.n):
-            print(self.matrix[i])
-        print()
-
-def main_function(n:int):
-    spiral = spiral_trail(n)
-    for i in range(1, n**2 + 1):
-        spiral.set_value(i)
-        spiral.direction_change()
-        spiral.next_step()
-
-    return spiral
+import conteiner
+import vaccine_class
+import validation
 
 
-def input_natural_number():
+def menu_exit(value):
+    exit(0)
+
+
+def menu_load(certificate_array : conteiner.CertificateConteiner):
+    variant = validation.input_validation('choose - для вибору файлу\n'
+                                          'default - стандартний файл(input.txt)', validation.is_menu,
+                                          ['choose', 'default'])
+    file = 'input.txt'
+    if variant == 'choose':
+        file = validation.input_validation('Введіть назву файла', validation.is_file)
+    certificate_array.input_from_file(file)
+
+
+def menu_set_answer_file(certificate_array : conteiner.CertificateConteiner):
+    file = validation.input_validation('Введіть назву файла', validation.is_file)
+    certificate_array.answer_file = file
+
+
+def menu_set_log_file(certificate_array : conteiner.CertificateConteiner):
+    file = validation.input_validation('Введіть назву файла', validation.is_file)
+    certificate_array.log_file = file
+
+
+def menu_add(certificate_array: conteiner.CertificateConteiner):
+    certificate = vaccine_class.COVID_CERTIFICATE()
+    certificate.input()
+    certificate_array.append(certificate)
+
+
+def menu_remove(certificate_array: conteiner.CertificateConteiner):
+    id = validation.input_validation('Введіть іd сертефікату для видалення')
+    certificate_array.remove(id)
+
+
+def menu_change(certificate_array: conteiner.CertificateConteiner):
+    id = validation.input_validation('Введіть id сертифікату до зміни', validation.is_in_list,
+                                     certificate_array.list_of_id)
+    changes = []
     while True:
-        try:
-            n = int(input())
-            if n <= 0 and n != -1:
-                int('error')
-            return n
-        except ValueError:
-            print('Ввід не правильний, спробуйте йще раз')
-        except KeyboardInterrupt:
-            print('Програма завершила свою роботу')
-            exit()
+        variant = validation.input_validation('next - ввести настпну зміну\n'
+                                              'stop - припинити вводити зміни', validation.is_menu, ['next', 'stop'])
+        if variant == 'stop':
+            certificate_array.change_by_id(id, changes)
+            return 0
+        name = input('Введіть назву поля, що хочете змінити\n')
+        val = input('Введіть нове значення\n')
+        changes.append(name + '=' + val)
 
 
+def menu_find(certificate_array: conteiner.CertificateConteiner):
+    to_find = input('Введіть рядок для пошуку, регістр важливий\n')
+    certificate_array.find_part(to_find)
 
 
-print('Введіть одне натуральне число n(для виходу з програми введіть -1)')
-while True:
-    n = input_natural_number()
-    if n == -1:
-        print('Програма закінчила свою роботу')
-        exit()
-    answer_matrix = main_function(n)
-    answer_matrix.output()
-    print('Для продовження роботи введіть йще одне число, або -1 для виходу з програми')
+def menu_sort(certificate_array: conteiner.CertificateConteiner):
+    name = validation.input_validation('Введіть поле по якому сортувати\n', validation.has_attribute,
+                                       vaccine_class.COVID_CERTIFICATE())
+    certificate_array.sort(name)
+
+
+def menu_clear(certificate_array: conteiner.CertificateConteiner):
+    certificate_array.clear()
+
+
+def menu_clear_log(certificate_array: conteiner.CertificateConteiner):
+    certificate_array.clear_log()
+
+
+def menu():
+    menu_parameters = {'exit': menu_exit, 'load': menu_load, 'set_answer_file': menu_set_answer_file,
+                       'set_log_file': menu_set_log_file, 'add': menu_add, 'remove': menu_remove, 'change': menu_change,
+                       'find': menu_find, 'sort': menu_sort, 'clear': menu_clear, 'clear_log_file': menu_clear_log}
+
+    text = 'exit - вийти з програми\n' \
+           'load - зчитати масив сертефікатів з файла\n' \
+           'set_answer_file - задати файл для відображення масиву\n' \
+           'set_log_file - задати файл для історії змін\n' \
+           'add - додати сертифікат\n' \
+           'remove - видалити сертефікат з масиву за id\n' \
+           'change - змінити параметри сертефіката за його id\n' \
+           'find - знайти сертефікати масиву, в яких фігурує певний рядок\n' \
+           'sort - сортувати\n' \
+           'clear - очистити масив сертефікатів\n' \
+           'clear_log_file - очистити файл історії\n'
+
+    while True:
+        certificate_array = conteiner.CertificateConteiner()
+        variant = validation.input_validation(text, validation.is_menu, list(menu_parameters.keys()))
+        menu_parameters[variant](certificate_array)
+
+
+file = open('answer.txt', 'w')
+file.write('')
+file.close()
+menu()
