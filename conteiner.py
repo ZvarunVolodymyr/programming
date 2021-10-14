@@ -160,6 +160,7 @@ class CertificateConteiner:
             validation.was_error('такого id немає', self.log_file)
             return
         obj = obj[0]
+        flag = False
         for j in changes:
             j = j.split('=')
             name = j[0]
@@ -178,6 +179,8 @@ class CertificateConteiner:
 
             self.update_log_file(
                 'значення в полі = "' + name + '" змінено:\n' + str(old) + ' -> ' + str(current))
+            flag = True
+        if flag:
             self.was_changed()
 
     @validation.many_decorator(validation.is_empty, validation.is_natural_number)
