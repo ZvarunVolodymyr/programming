@@ -6,7 +6,7 @@ def comparison(a:str, b:str, comparator):
     return comparator(a, b)
 
 
-def merge(list_1, list_2, comparator, name):
+def merge(list_1, list_2, comparator):
     new_list = []
     left_pointer = 0
     right_pointer = 0
@@ -38,6 +38,4 @@ def merge_sort(array: [], comparator, name):
     return merge(list_1, list_2, comparator, name)
 
 
-def default_comparator(a, b):
-    return a.id > b.id
 

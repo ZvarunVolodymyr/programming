@@ -1,5 +1,5 @@
 import validation
-from sort import default_comparator, merge_sort
+from sort import merge_sort
 from vaccine_class import COVID_CERTIFICATE
 
 
@@ -15,6 +15,7 @@ class CertificateConteiner:
         if load_from_file != '':
             self.input_from_file(load_from_file)
 
+    @validation.is_file
     def input_from_file(self, file_name=''):
         self.update_log_file('Load info from:\n' + str(file_name))
         file = open(file_name)
@@ -40,10 +41,9 @@ class CertificateConteiner:
                 continue
 
             input_ = line.split(':')
-            certificate.__setattr__(input_[0].strip(), certificate.is_valid(input_[0].strip(), input_[1].strip(),
-                                                                            self.log_file))
+            certificate.setattr(input_[0].strip(), input_[1].strip(), self.log_file)
             if line[0].strip() == 'id':
-                self.add_id(certificate.is_valid(input_[0].strip(), input_[1].strip()))
+                self.add_id(certificate.get_attr(input_[0].strip(), input_[1].strip()))
         file.close()
 
     def update_answer_file(self):
@@ -104,8 +104,10 @@ class CertificateConteiner:
 
     def sort(self, name=''):
         self.update_log_file('sort with')
+
         def comp(a, b):
             return a.get_attr(name) > b.get_attr(name)
+
         self.list_ = merge_sort(self.list_, comp, name)
         self.update_answer_file()
 
@@ -116,13 +118,15 @@ class CertificateConteiner:
             self.list_.remove(i)
         self.update_answer_file()
 
+    @validation.many_decorator(validation.is_empty, validation.is_natural_number)
     def add_id(self, id):
-        id = int(id)
+        id = validation.is_natural_number(id)
         if id in self.list_of_id:
             validation.was_error('такий id уже існує', self.log_file)
             return
         self.list_of_id.append(id)
 
+    @validation.many_decorator(validation.is_empty, validation.is_natural_number)
     def change_by_id(self, id_to_change, changes=[]):
         flag = False
         self.update_log_file('change in id = ' + str(id_to_change))
@@ -135,7 +139,7 @@ class CertificateConteiner:
                 old = i.get_attr(name, self.log_file)
                 if old is None:
                     continue
-                if i.__setattr__(name, i.is_valid(name, value)):
+                if i.__setattr__(name, i.function_decorate(name, value)):
                     continue
                 current = i.get_attr(name)
                 if current is None:
@@ -151,6 +155,7 @@ class CertificateConteiner:
         if not flag:
             validation.was_error('такого id немає', self.log_file)
 
+    @validation.many_decorator(validation.is_empty, validation.is_natural_number)
     def has_id(self, id):
         return id in self.list_of_id
 
