@@ -6,13 +6,11 @@ class history:
         value = {}
 
         def __init__(self, obj):
-            dict_ = vars(obj)
-            self.value = {i[0]: copy.deepcopy(i[1]) for i in dict_.items() if type(i[1]) != type(history(None))}
-            self.value = self.value
+            dict_ = obj.export_snap()
+            self.value = {i[0]: copy.deepcopy(i[1]) for i in dict_.items()}
 
         def import_to(self, obj):
-            for i in self.value.items():
-                obj.__setattr__(i[0], copy.deepcopy(i[1]))
+            obj.import_snap(self.value)
 
     obj = None
     current_id = -1

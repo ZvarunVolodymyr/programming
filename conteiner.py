@@ -1,3 +1,5 @@
+import copy
+
 import memento
 import validation
 from sort import merge_sort
@@ -10,6 +12,7 @@ class CertificateConteiner:
     answer_file = ''
     log_file = ''
     history = None
+    __attributes = ['list_', '_CertificateConteiner__list_of_id']
 
     def __init__(self, load_from_file='', answer_file='answer.txt', log_file='log.txt'):
         self.list_ = []
@@ -210,3 +213,13 @@ class CertificateConteiner:
         if self.history.redo():
             self.update_log_file('REDO')
             self.update_answer_file()
+
+    def export_snap(self):
+        value = {}
+        for i in self.__attributes:
+            value[i] = self.__getattribute__(i)
+        return value
+
+    def import_snap(self, value: {}):
+        for i in value.items():
+            self.__setattr__(i[0], copy.deepcopy(i[1]))
