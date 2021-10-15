@@ -12,7 +12,7 @@ class CertificateConteiner:
     answer_file = ''
     log_file = ''
     history = None
-    __attributes = ['list_', '_CertificateConteiner__list_of_id']
+    __attributes = ('list_', '__list_of_id')
 
     def __init__(self, load_from_file='', answer_file='answer.txt', log_file='log.txt'):
         self.list_ = []
@@ -217,9 +217,13 @@ class CertificateConteiner:
     def export_snap(self):
         value = {}
         for i in self.__attributes:
+            if i.startswith('__'):
+                i = '_' + type(self).__name__ + i
             value[i] = self.__getattribute__(i)
         return value
 
     def import_snap(self, value: {}):
         for i in value.items():
+            if i[0].startswith('__'):
+                i[0] = '_' + type(self).__name__ + i
             self.__setattr__(i[0], copy.deepcopy(i[1]))
