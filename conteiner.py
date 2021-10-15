@@ -6,14 +6,14 @@ from vaccine_class import COVID_CERTIFICATE
 
 class CertificateConteiner:
     list_ = []
-    list_of_id = []
+    __list_of_id = []
     answer_file = ''
     log_file = ''
     history = None
 
     def __init__(self, load_from_file='', answer_file='answer.txt', log_file='log.txt'):
         self.list_ = []
-        self.list_of_id = []
+        self.__list_of_id = []
         self.clear_history()
         self.answer_file = answer_file
         self.log_file = log_file
@@ -25,24 +25,24 @@ class CertificateConteiner:
 
     def get_new_id(self):
         new_id = 1
-        while new_id in self.list_of_id:
+        while new_id in self.__list_of_id:
             new_id += 1
         return new_id
 
     def unique_id(self):
-        self.list_of_id.sort()
-        for i in range(1, len(self.list_of_id)):
-            if self.list_of_id[i] == self.list_of_id[i - 1]:
+        self.__list_of_id.sort()
+        for i in range(1, len(self.__list_of_id)):
+            if self.__list_of_id[i] == self.__list_of_id[i - 1]:
                 new_id = self.get_new_id()
-                validation.was_error(f'id {self.list_of_id[i]} вже зайняте, воно змінене на {new_id}',
+                validation.was_error(f'id {self.__list_of_id[i]} вже зайняте, воно змінене на {new_id}',
                                      file=self.log_file)
-                self.change_by_id(self.list_of_id[i], [f'id={new_id}'])
+                self.change_by_id(self.__list_of_id[i], [f'id={new_id}'])
                 self.history.pop_snap()
 
     def swap_id(self, old, new):
-        for i, val in enumerate(self.list_of_id):
+        for i, val in enumerate(self.__list_of_id):
             if val == old:
-                self.list_of_id[i] = new
+                self.__list_of_id[i] = new
                 return
 
     @validation.many_decorator(validation.is_empty, validation.is_file)
@@ -150,7 +150,7 @@ class CertificateConteiner:
 
     @validation.many_decorator(validation.is_empty, validation.is_natural_number)
     def add_id(self, id):
-        self.list_of_id.append(id)
+        self.__list_of_id.append(id)
 
     @validation.many_decorator(validation.is_empty, validation.is_natural_number)
     def change_by_id(self, id_to_change, changes=[]):
@@ -185,7 +185,7 @@ class CertificateConteiner:
 
     @validation.many_decorator(validation.is_empty, validation.is_natural_number)
     def has_id(self, id):
-        return id in self.list_of_id
+        return id in self.__list_of_id
 
     def clear_log(self):
         file = open(self.log_file, 'w')
@@ -194,7 +194,7 @@ class CertificateConteiner:
 
     def clear(self):
         self.list_.clear()
-        self.list_of_id.clear()
+        self.__list_of_id.clear()
         self.was_changed()
 
     def was_changed(self):
