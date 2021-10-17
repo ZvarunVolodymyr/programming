@@ -220,10 +220,10 @@ class CertificateConteiner:
             if i.startswith('__'):
                 i = '_' + type(self).__name__ + i
             value[i] = self.__getattribute__(i)
-        return memento.snap(value)
+        return memento.snap(**value)
 
     def import_snap(self, snap: memento.snap):
-        for i in snap.value.items():
+        for i in snap.kwargs.items():
             if i[0].startswith('__'):
                 i[0] = '_' + type(self).__name__ + i
             self.__setattr__(i[0], copy.deepcopy(i[1]))

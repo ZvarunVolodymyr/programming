@@ -2,10 +2,11 @@ import copy
 
 
 class snap:
-    value = {}
+    value = None
+    kwargs = None
 
-    def __init__(self, dict_):
-        self.value = {i[0]: copy.deepcopy(i[1]) for i in dict_.items()}
+    def __init__(self, *value, **kwargs):
+        self.kwargs = {i[0]: copy.deepcopy(i[1]) for i in kwargs.items()}
 
 
 class history:
