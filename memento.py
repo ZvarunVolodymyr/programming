@@ -7,6 +7,7 @@ class snap:
 
     def __init__(self, *value, **kwargs):
         self.kwargs = {i[0]: copy.deepcopy(i[1]) for i in kwargs.items()}
+        self.value = [copy.deepcopy(i) for i in value]
 
 
 class history:
