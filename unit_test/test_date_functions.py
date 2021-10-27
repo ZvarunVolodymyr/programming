@@ -36,6 +36,7 @@ class TestDateFunctions(TestCase):
         self.assertEqual(true_('10.2.12', '21.2.12'), '2.5.24')
         self.assertEqual(true_('10.4.12', '21.4.12'), '1.9.24')
 
+
     def test_comparison(self):
         false_ = functools.partial(false, obj=self, func=comparison)
         true_ = functools.partial(true, obj=self, func=comparison)
