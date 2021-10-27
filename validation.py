@@ -32,9 +32,6 @@ def many_decorator(*decorators):
     return decorator
 
 
-import date_functions
-
-
 @call_decorate
 def is_empty(func=lambda x: x):
     @function_decorate
@@ -83,23 +80,20 @@ def is_natural_number(func=lambda x: x):
 
 
 @call_decorate
-def is_menu(func=lambda x: x):
+def is_in_list(func=lambda x: x):
     @function_decorate
     def decorator(n, list_):
-        n = n.strip()
         if not n in list_:
-            raise ValueError(str(n) + ' не є полем меню')
+            raise ValueError(str(n) + ' немає в потрібному масиві')
         return func(n)
     return decorator
 
 
 @call_decorate
-def is_in_list(func=lambda x: x):
+def is_menu(func=lambda x: x):
     @function_decorate
-    @many_decorator(is_natural_number, is_empty)
-    def decorator(n, list_):
-        if not n in list_:
-            raise ValueError(str(n) + ' немає в потрібному масиві')
+    @is_in_list
+    def decorator(n):
         return func(n)
     return decorator
 
@@ -147,84 +141,6 @@ def is_valid_array(func=lambda x: x):
             s[i].strip()
             s[i] = func_(s[i])
         return func(s)
-    return decorator
-
-
-@call_decorate
-def is_date(func=lambda x: x):
-    @function_decorate
-    def decorator(date):
-
-        n = date.split('.')
-        filter(lambda x: x != '', n)
-        if len(n) != 3:
-            raise ValueError(str(date) + ': некоректна дата')
-        try:
-            day = is_natural_number(n[0])
-            month = is_natural_number(n[1])
-            year = is_natural_number(n[2])
-            if day > 31 or month > 12 or month == 0 or day == 0:
-                raise ValueError(str(date) + ': некоректна дата')
-            date_functions.is_month_day(day, month, year)
-        except ValueError:
-            raise ValueError(str(date) + ': некоректна дата')
-        return func('.'.join([str(day), str(month), str(year)]))
-    return decorator
-
-
-@call_decorate
-def is_date_term(func=lambda x: x):
-    @function_decorate
-    def decorator(date):
-        n = date.split('.')
-        day = is_int_number(n[0])
-        month = is_int_number(n[1])
-        year = is_int_number(n[2])
-        if day < 0 or month < 0 or year < 0:
-            raise ValueError(str(date) + ' не коректний термін ')
-        return func(date)
-    return decorator
-
-
-@call_decorate
-def is_date_after_term(func=lambda x: x):
-    @function_decorate
-    @many_decorator(is_date, is_date, is_date_term)
-    def decorator(this_date, start, term):
-        n = this_date
-        date = date_functions.date_plus_date(start, term)
-        if not date_functions.comparison(n, date) or date_functions.comparison(n, start):
-            raise ValueError(str(n) + ' виходить за межі терміну')
-        return func(n)
-    return decorator
-
-
-@call_decorate
-def is_date_between(func=lambda x: x):
-    @function_decorate
-    @many_decorator(is_date, is_date, is_date_term, is_date_term)
-    def decorator(date, start, term_1, term_2):
-        flag = False
-        try:
-            is_date_after_term(date, start, term_1)
-            flag = True
-            raise ValueError(str(date) + ': некоректна дата')
-        except ValueError as error:
-            if flag:
-                raise ValueError(error)
-        if is_date_after_term(date, start, term_2):
-            return func(date)
-    return decorator
-
-
-@call_decorate
-def is_date_in_range(func=lambda x: x):
-    @function_decorate
-    @many_decorator(is_date, is_date, is_date)
-    def decorator(date, start, end):
-        if not date_functions.comparison(start, date) or not date_functions.comparison(start, end):
-            raise ValueError(str(date) + ' : некоректна дата')
-        return func(date)
     return decorator
 
 

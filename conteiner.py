@@ -1,3 +1,6 @@
+import copy
+
+import memento
 import validation
 from sort import merge_sort
 from vaccine_class import COVID_CERTIFICATE
@@ -5,45 +8,74 @@ from vaccine_class import COVID_CERTIFICATE
 
 class CertificateConteiner:
     list_ = []
-    list_of_id = []
+    __list_of_id = []
     answer_file = ''
     log_file = ''
+    history = None
+    __attributes = ('list_', '__list_of_id')
 
     def __init__(self, load_from_file='', answer_file='answer.txt', log_file='log.txt'):
+        self.list_ = []
+        self.__list_of_id = []
+        self.clear_history()
         self.answer_file = answer_file
         self.log_file = log_file
         if load_from_file != '':
             self.input_from_file(load_from_file)
 
-    @validation.is_file
+    def clear_history(self):
+        self.history = memento.history(self)
+
+    def get_new_id(self):
+        new_id = 1
+        while new_id in self.__list_of_id:
+            new_id += 1
+        return new_id
+
+    def unique_id(self):
+        self.__list_of_id.sort()
+        for i in range(1, len(self.__list_of_id)):
+            if self.__list_of_id[i] == self.__list_of_id[i - 1]:
+                new_id = self.get_new_id()
+                validation.was_error(f'id {self.__list_of_id[i]} вже зайняте, воно змінене на {new_id}',
+                                     file=self.log_file)
+                self.change_by_id(self.__list_of_id[i], [f'id={new_id}'])
+                self.history.pop_snap()
+
+    def swap_id(self, old, new):
+        for i, val in enumerate(self.__list_of_id):
+            if val == old:
+                self.__list_of_id[i] = new
+                return
+
+    @validation.many_decorator(validation.is_empty, validation.is_file)
     def input_from_file(self, file_name=''):
+        self.clear()
         self.update_log_file('Load info from:\n' + str(file_name))
         file = open(file_name)
-        self.list_.clear()
-        self.list_of_id.clear()
         certificate = COVID_CERTIFICATE()
         flag = False
-        for line in file:
+        for line in file.readlines()[1:]:
             if line[0] == '-':
                 if not certificate.has_value(None) and not certificate.has_value(''):
                     self.append(certificate)
+                    self.history.pop_snap()
+                    flag = True
                     certificate = COVID_CERTIFICATE()
-                elif flag:
-                    s = 'Неправильні данні у: '
-                    t = '\n'
+                else:
+                    s = 'Неправильні данні у: \n'
                     names = certificate.get_attr_names()
-                    for i in names:
-                        if certificate.__getattribute__(i) is None or certificate.__getattribute__(i) == '':
-                            t += i + '\n'
-                    validation.was_error(s + t, self.log_file)
+                    t = [i if certificate.__getattribute__(i) is None or certificate.__getattribute__(i) == '' else ''
+                         for i in names]
+                    t = filter(lambda x: x != '', t)
+                    validation.was_error(s + '\n'.join(t), self.log_file)
                 self.update_log_file('')
-                flag = True
                 continue
 
-            input_ = line.split(':')
-            certificate.setattr(input_[0].strip(), input_[1].strip(), self.log_file)
-            if line[0].strip() == 'id':
-                self.add_id(certificate.get_attr(input_[0].strip(), input_[1].strip()))
+            input_ = list(map(lambda x: x.strip(), line.split(':')))
+            certificate.setattr(input_[0], input_[1], self.log_file)
+        if flag:
+            self.was_changed()
         file.close()
 
     def update_answer_file(self):
@@ -61,23 +93,25 @@ class CertificateConteiner:
 
     def append(self, value):
         if type(value) != COVID_CERTIFICATE:
-            validation.was_error()
-            return
+            raise ValueError
         self.update_log_file('Add:\n' + str(value))
         self.add_id(value.id)
         self.list_.append(value)
-        self.update_answer_file()
+        self.unique_id()
+        self.was_changed()
+
+    def __len__(self):
+        return len(self.list_)
 
     def part_str(self):
         s = ''
         for i in self.list_:
-            s += str(i)
+            s += i.part_str() + '|'
         return s
 
     def __str__(self):
-        s = ''
-        for i in self.list_:
-            s += '-' * 100 + '\n' + str(i) + '\n'
+        s = '-' * 100 + '\n'
+        s += ('-' * 100 + '\n').join(str(i) + '\n' for i in self.list_)
         s += '-' * 100 + '\n'
         return s
 
@@ -87,14 +121,15 @@ class CertificateConteiner:
         answer = []
         for i in self.list_:
             if s in i.part_str():
-                answer.append(i)
+                answer.append(i.id)
                 text += str(i.id) + '\n'
         self.update_log_file(text)
         return answer
 
-    def find(self, value, field_name=''):
+    def find(self, value, field_name='id', is_reversed=False):
         answer = []
-        for i in self.list_:
+        value = str(value)
+        for i in self.list_[::-1 if is_reversed else 1]:
             if field_name == '' and i.has_value(value) or field_name != '' and i.get_attr_str(field_name) == value:
                 answer.append(i)
         return answer
@@ -102,62 +137,60 @@ class CertificateConteiner:
     def __getitem__(self, item):
         return self.list_[item]
 
-    def sort(self, name=''):
+    def sort(self, name='id'):
         self.update_log_file('sort with')
 
         def comp(a, b):
-            return a.get_attr(name) > b.get_attr(name)
+            return a.getattr(name) > b.getattr(name)
 
-        self.list_ = merge_sort(self.list_, comp, name)
-        self.update_answer_file()
+        self.list_ = merge_sort(self.list_, comp)
+        self.was_changed()
 
     def remove(self, value_to_remove, field_name='id'):
         to_remove = self.find(value_to_remove, field_name)
         for i in to_remove:
             self.update_log_file('remove:\n' + str(i))
             self.list_.remove(i)
-        self.update_answer_file()
+            self.was_changed()
 
     @validation.many_decorator(validation.is_empty, validation.is_natural_number)
     def add_id(self, id):
-        id = validation.is_natural_number(id)
-        if id in self.list_of_id:
-            validation.was_error('такий id уже існує', self.log_file)
-            return
-        self.list_of_id.append(id)
+        self.__list_of_id.append(id)
 
     @validation.many_decorator(validation.is_empty, validation.is_natural_number)
     def change_by_id(self, id_to_change, changes=[]):
-        flag = False
-        self.update_log_file('change in id = ' + str(id_to_change))
-        for i in self.find(id_to_change):
-            flag = True
-            for j in changes:
-                j = j.split('=')
-                name = j[0]
-                value = j[1]
-                old = i.get_attr(name, self.log_file)
-                if old is None:
-                    continue
-                if i.__setattr__(name, i.function_decorate(name, value)):
-                    continue
-                current = i.get_attr(name)
-                if current is None:
-                    i.__setattr__(name, old)
-                    continue
-                if name == 'id':
-                    self.list_of_id.remove(old)
-                    self.add_id(current)
-
-                self.update_log_file(
-                    'value in field = "' + name + '" was changed:\n' + str(old) + ' -> ' + str(current))
-                self.update_answer_file()
-        if not flag:
+        self.update_log_file('зміна в ід = ' + str(id_to_change))
+        obj = self.find(id_to_change, 'id', True)
+        if len(obj) == 0:
             validation.was_error('такого id немає', self.log_file)
+            return
+        obj = obj[0]
+        flag = False
+        for j in changes:
+            j = j.split('=')
+            name = j[0]
+            value = j[1]
+            old = obj.getattr(name, file=self.log_file, function='print')
+            if old is None:
+                continue
+            obj.setattr(name, value)
+            current = obj.getattr(name, file=self.log_file, function='print')
+            if current is None:
+                obj.setattr(name, old)
+                continue
+            if name == 'id':
+                self.swap_id(old, current)
+                self.unique_id()
+
+            self.update_log_file(
+                'значення в полі = "' + name + '" змінено:\n' + str(old) + ' -> ' + str(current))
+            flag = True
+        if flag:
+            self.was_changed()
 
     @validation.many_decorator(validation.is_empty, validation.is_natural_number)
     def has_id(self, id):
-        return id in self.list_of_id
+        return id in self.__list_of_id
 
     def clear_log(self):
         file = open(self.log_file, 'w')
@@ -166,4 +199,41 @@ class CertificateConteiner:
 
     def clear(self):
         self.list_.clear()
-        self.list_of_id.clear()
+        self.__list_of_id.clear()
+        self.was_changed()
+
+    def was_changed(self):
+        self.history.new_snap()
+        self.update_answer_file()
+
+    def undo(self):
+        if self.history.undo():
+            self.update_log_file('UNDO')
+            self.update_answer_file()
+
+    def redo(self):
+        if self.history.redo():
+            self.update_log_file('REDO')
+            self.update_answer_file()
+
+    def export_snap(self):
+        value = {}
+        for i in self.__attributes:
+            if i.startswith('__'):
+                i = '_' + type(self).__name__ + i
+            value[i] = self.__getattribute__(i)
+        return memento.snap(**value)
+
+    def import_snap(self, snap: memento.snap):
+        for i in snap.kwargs.items():
+            if i[0].startswith('__'):
+                i[0] = '_' + type(self).__name__ + i
+            self.__setattr__(i[0], copy.deepcopy(i[1]))
+
+    def __eq__(self, obj):
+        if len(self) != len(obj):
+            return False
+        for i in range(len(self.list_)):
+            if obj[i] != self[i]:
+                return False
+        return True
