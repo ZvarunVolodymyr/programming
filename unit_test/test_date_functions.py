@@ -1,7 +1,7 @@
 import functools, unittest
 from unittest import TestCase
 from date_functions import *
-from help_function import false, true
+from unit_test.help_function import false, true
 
 
 class TestDateFunctions(TestCase):

@@ -1,6 +1,6 @@
 import functools, unittest
 from unittest import TestCase
-from help_function import false, true
+from unit_test.help_function import false, true
 
 import vaccine_class
 import vaccine_validation

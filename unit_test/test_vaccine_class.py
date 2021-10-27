@@ -1,6 +1,6 @@
 from unittest import TestCase
 import vaccine_class, unittest, functools
-from help_function import false, true
+from unit_test.help_function import false, true
 
 
 def correct_1():
