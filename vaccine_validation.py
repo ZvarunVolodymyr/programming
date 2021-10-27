@@ -1,41 +1,43 @@
+import date_functions
 import validation
 from functools import partial
 
 
 def get_vaccine_validation_functions(name):
     a = {'id': is_id, 'username': is_username, 'birth_date': is_birth_date, 'start_date': is_start_date,
-            'end_date': is_end_date, 'international_passport': is_international_passport, 'vaccine': is_vaccine}
+         'end_date': is_end_date, 'international_passport': is_international_passport, 'vaccine': is_vaccine}
     return a[name]
 
 
 def vaccine_decorator(func):
     def decorator(obj, name, val, log_file='', is_input=False):
         try:
-            return func(obj, name, get_vaccine_validation_functions(name)(val, obj))
+            return func(obj, name, get_vaccine_validation_functions(name)(val, name, obj))
         except Exception as error:
             if is_input:
                 raise ValueError(error)
             validation.was_error(error, log_file)
             return None
+
     return decorator
 
 
 def attributes(func):
-    def decorator(val, vaccine_object):
-        name = func.__name__
+    def decorator(val, name, vaccine_object):
         try:
             attributes = [val]
-            if name == 'is_birth_date':
+            if name == 'birth_date':
                 attributes += ['1.1.1950', '1.1.2021']
-            if name == 'is_start_date':
+            if name == 'start_date':
                 attributes += [vaccine_object.birth_date, '14.0.0', '0.0.120']
-            if name == 'is_end_date':
+            if name == 'end_date':
                 attributes += [vaccine_object.start_date, '0.0.1']
             return func(*attributes)
         except ValueError as error:
             raise error
         except KeyError:
             raise ValueError('такого поля не існує')
+
     return decorator
 
 
@@ -53,7 +55,7 @@ def is_username(n):
 
 
 @attributes
-@validation.is_date_in_range
+@date_functions.is_date_in_range
 def is_birth_date(value):
     return value
 
@@ -62,14 +64,14 @@ def is_birth_date(value):
 def is_start_date(*value):
     if value[1] is None or value[1] == '':
         raise ValueError('start_date не перевірити: birth_date не валідне')
-    return validation.is_date_between(*value)
+    return date_functions.is_date_between(*value)
 
 
 @attributes
 def is_end_date(*value):
     if value[1] is None or value[1] == '':
         raise ValueError('end_date не перевірити: birth_date не валідне')
-    return validation.is_date_after_term(*value)
+    return date_functions.is_date_after_term(*value)
 
 
 @attributes

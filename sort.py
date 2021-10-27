@@ -29,13 +29,13 @@ def merge(list_1, list_2, comparator):
     return new_list
 
 
-def merge_sort(array: [], comparator, name):
+def merge_sort(array: [], comparator):
     sz = len(array)
     if sz == 1:
         return array
-    list_1 = merge_sort(array[:sz // 2], comparator, name)
-    list_2 = merge_sort(array[sz // 2:], comparator, name)
-    return merge(list_1, list_2, comparator, name)
+    list_1 = merge_sort(array[:sz // 2], comparator)
+    list_2 = merge_sort(array[sz // 2:], comparator)
+    return merge(list_1, list_2, comparator)
 
 
 
