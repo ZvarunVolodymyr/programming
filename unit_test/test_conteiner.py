@@ -121,6 +121,14 @@ class TestCertificateConteiner(TestCase):
         obj.clear()
         self.assertEqual(obj, correct_0())
 
+    def test_undo_redo(self):
+        obj = correct_1()
+        obj.append(vaccine_class.COVID_CERTIFICATE(1, 'z', '1.1.2000', '1.1.2001', '5.1.2001', 'pfizer', 'aa000001'))
+        obj.undo()
+        self.assertEqual(obj, correct_1())
+        obj.undo()
+        obj.redo()
+        self.assertEqual(obj, correct_2())
 
 if __name__ == '__main__':
     unittest.main()
