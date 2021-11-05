@@ -80,23 +80,20 @@ def is_natural_number(func=lambda x: x):
 
 
 @call_decorate
-def is_menu(func=lambda x: x):
+def is_in_list(func=lambda x: x):
     @function_decorate
     def decorator(n, list_):
-        n = n.strip()
         if not n in list_:
-            raise ValueError(str(n) + ' не є полем меню')
+            raise ValueError(str(n) + ' немає в потрібному масиві')
         return func(n)
     return decorator
 
 
 @call_decorate
-def is_in_list(func=lambda x: x):
+def is_menu(func=lambda x: x):
     @function_decorate
-    @many_decorator(is_natural_number, is_empty)
-    def decorator(n, list_):
-        if not n in list_:
-            raise ValueError(str(n) + ' немає в потрібному масиві')
+    @is_in_list
+    def decorator(n):
         return func(n)
     return decorator
 
@@ -159,10 +156,21 @@ def is_file(func=lambda x: x):
 
 
 @call_decorate
-def is_vaccine_filed(func=lambda x: x):
+def is_class_filed(func=lambda x: x):
     @function_decorate
     def decorator(val, func_, name):
         return func(func_(name, val, is_input=True))
+    return decorator
+
+
+@call_decorate
+def is_int_in_range(func=lambda x: x):
+    @function_decorate
+    @many_decorator(is_int_number, is_int_number, is_int_number)
+    def decorator(val, a, b):
+        if not (a <= val <= b):
+            raise ValueError('число виходить за межі')
+        return func(val)
     return decorator
 
 

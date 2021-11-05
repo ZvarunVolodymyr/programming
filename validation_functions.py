@@ -32,7 +32,7 @@ def is_input(*value_for_conditional, function=None, text=""):
             exit()
 
 
-def is_valid(*value_for_conditional, function=None):
+def is_valid(*value_for_conditional, function=None, **none):
     try:
         return function(*value_for_conditional)
     except ValueError as error:
