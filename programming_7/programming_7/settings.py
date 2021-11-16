@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
+from dotenv import load_dotenv, find_dotenv
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'certificate.apps.CertificateConfig',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -75,14 +78,15 @@ WSGI_APPLICATION = 'programming_7.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+load_dotenv(find_dotenv('.gitignore/.env'))
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'vaccine_data',
-        'USER': 'postgres',
-        'PASSWORD': 'admin68989279',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'ENGINE': os.getenv('ENGINE'),
+        'NAME': os.getenv('NAME'),
+        'USER': os.getenv('USERNAME'),
+        'PASSWORD': os.getenv('PASSWORD'),
+        'HOST': os.getenv('HOST'),
+        'PORT': os.getenv('PORT'),
     }
 }
 
